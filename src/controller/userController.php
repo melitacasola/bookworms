@@ -13,7 +13,7 @@ class UserController {
     }
 
     public function getUsers(){
-       return $this -> userModel -> getUsers();
+        return $this -> userModel -> getUsers();
     }
 
     public function login(){
@@ -34,7 +34,13 @@ class UserController {
                     }
 
                 }
-            echo  "Usuario o contraseña incorrecta";
+                
+            echo  '<div class="d-flex justify-content-around mt-5 col-sm-12">
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Usuario o contraseña incorrectos</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </div>';
 
             }
         }

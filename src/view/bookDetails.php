@@ -34,7 +34,7 @@ $book = $bookController->getBookDetails($bookId);
             <img src="../../resources/img/bookworms.png" alt="Logo" class="logo">
         </a>
         <div class="form-inline mb-3 d-flex justify-content-around align-items-center">
-            <a href="../../index.php" class="btn btn-primary ml-2 secondary-button me-2">Home</a>
+            <a href="../../index.php" class="btn btn-primary ml-2 secondary-button me-2">Back to Home</a>
         </div>
     </header>
     <main class="container">
@@ -48,7 +48,7 @@ $book = $bookController->getBookDetails($bookId);
     </main>
   
     <?php
-    require_once __DIR__ . '/head/footer.php';
+    require_once __DIR__ . '/footer/footer.php';
     ?>
 
 

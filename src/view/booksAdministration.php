@@ -29,59 +29,15 @@ if ($bookId !== null) {
 
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && $bookId !== null) {
     $result = $booksController->deleteBook($bookId);
-
-    if ($result) {
-        header("Location: ../view/booksAdministration.php");
-        exit();
-    } else {
-        echo 'Error al eliminar el libro';
-    }
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    unset($_SESSION['isbn'], $_SESSION['title'], $_SESSION['author'], $_SESSION['description']);
+    $booksController->handleFormSubmission(); 
+
+    unset($_SESSION['isbn'], $_SESSION['title'], $_SESSION['author'], $_SESSION['image'], $_SESSION['description']);
+    
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST["addBook"])) {
-        if (empty($_POST["isbn"]) || empty($_POST["title"]) || empty($_POST["author"]) || empty($_FILES["image"]) || empty($_POST["description"])) {
-            $_SESSION['isbn'] = $_POST["isbn"];
-            $_SESSION['title'] = $_POST["title"];
-            $_SESSION['author'] = $_POST["author"];
-            $_SESSION['image'] = $_FILES["image"];
-            $_SESSION['description'] = $_POST["description"];
-
-            $error = "Error! Todos los campos son obligatorios.";
-        } else {
-            $isbn = $_POST["isbn"];
-            $title = $_POST["title"];
-            $author = $_POST["author"];
-            $image = file_get_contents($_FILES["image"]["tmp_name"]);
-            $description = $_POST["description"];
-
-            $newbook = new BooksController;
-
-            $newbook->addBook($isbn, $title, $author, $image, $description);
-        
-            exit();
-        }
-    } elseif (isset($_POST['editBookSubmit'])) {
-        $isbn = $_POST['isbn'];
-        $title = $_POST['title'];
-        $author = $_POST['author'];
-        $image = file_get_contents($_FILES["image"]["tmp_name"]);
-        $description = $_POST['description'];
-
-        $bookId = $_POST['bookId'];
-        $result = $booksController->editBook($bookId, $isbn, $title, $author, $image, $description);
-
-        if ($result) {
-            exit();
-        } else {
-            echo 'Error al editar el libro';
-        }
-    }
-}
 
     $searchKeyword = isset($_GET['keyword']) ? $_GET['keyword'] : '';
     $books = $booksController->searchBooks($searchKeyword);
@@ -117,22 +73,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <main>
         <h1 class="m-3 text-center my-5 first-title">BOOKWORMS</h1>
+        
         <div class="row">
-            <div class="d-flex justify-content-around mx-2 col-sm-12">
-                <?php if (isset($error)) : ?>
+            <div class="d-flex justify-content-center ">
+                <?php if (isset($_SESSION['error'])) : ?>
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <strong><?php echo $error; ?></strong>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <strong><?php echo $_SESSION['error']; ?></<strong>
+                    <?php unset($_SESSION['error']); ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 <?php endif; ?>
-                <?php if (isset($_GET['success'])) : ?>
+
+                <?php if (isset($_SESSION['success'])) : ?>
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <?php echo $_GET['success']; ?>
+                        <?php echo $_SESSION['success']; ?>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
+                    <?php unset($_SESSION['success']); ?>
                 <?php endif; ?>
             </div>
         </div>
+        <?php var_dump($_SESSION) ; ?>
+        
         <form action="<?= $_SERVER['PHP_SELF'] ?>" method="post" enctype="multipart/form-data">
             <div class="d-flex justify-content-around">
                 <div class="left-column">
@@ -232,5 +194,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </main>
 
     <?php
-    require_once __DIR__ . '/head/footer.php';
+    require_once __DIR__ . '/footer/footer.php';
     ?>

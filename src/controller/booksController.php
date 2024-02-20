@@ -44,8 +44,10 @@ class BooksController
 
             if (!empty($isbn) && !empty($title) && !empty($author) && !empty($image) && !empty($description)) {
                 $result = $this->model->addBook($isbn, $title, $author, $image, $description);
-                $success = 'Los datos fueron añadidos correctamente';
-                return header("Location: ../view/booksAdministration.php?success=" . urlencode($success));
+                $this->handleSuccess("Los datos fueron agregados correctamente.");
+
+                // unset($_SESSION['isbn'], $_SESSION['title'], $_SESSION['author'], $_SESSION['image'], $_SESSION['description']);
+                return header("Location: ../view/booksAdministration.php");
             } else {
                 return 'Error al crear el libro';
             }
@@ -61,8 +63,82 @@ class BooksController
     public function editBook($id, $isbn, $title, $author, $image, $description)
     {
         $result = $this->model->editBook($id, $isbn, $title, $author, $image, $description);
-        $success = 'Los datos fueron editados correctamente';
 
-        return ($result) ?  header("Location: ../view/booksAdministration.php?success=" . urlencode($success)): 'error al Editar libro';
+        $this->handleSuccess("Los datos fueron editados correctamente.");
+        return ($result) ?  header("Location: ../view/booksAdministration.php"): 'error al Editar libro';
     }
+
+    public function handleErrors($errorMessage)
+    {
+        $_SESSION['error'] = $errorMessage;
+        header('Location: ../view/booksAdministration.php');
+        exit();
+    }
+
+    public function handleSuccess($successMessage)
+    {
+        $_SESSION['success'] = $successMessage;
+        header('Location: ../view/booksAdministration.php');
+        exit();
+    }
+
+    public function handleFormSubmission()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (isset($_POST["addBook"])) {
+                if (empty($_POST["isbn"]) || empty($_POST["title"]) || empty($_POST["author"]) || empty($_FILES["image"]["tmp_name"]) || empty($_POST["description"])) {
+
+                    // $_SESSION['isbn'] = $_POST["isbn"];
+                    // $_SESSION['title'] = $_POST["title"];
+                    // $_SESSION['author'] = $_POST["author"];
+                    // $_SESSION['image'] = $_FILES["image"]["tmp_name"];
+                    // $_SESSION['description'] = $_POST["description"];
+
+                    $this->handleErrors("Error! Todos los campos son obligatorios.");
+                    // unset($_SESSION['isbn'], $_SESSION['title'], $_SESSION['author'], $_SESSION['image'], $_SESSION['description']);
+
+                } else {
+                    $isbn = $_POST["isbn"];
+                    $title = $_POST["title"];
+                    $author = $_POST["author"];
+                    $image = file_get_contents($_FILES["image"]["tmp_name"]);
+                    $description = $_POST["description"];
+
+                    
+                    if ($image === false) {
+                        $this->handleErrors("Error al cargar la imagen.");
+                    }
+
+                    $this->addBook($isbn, $title, $author, $image, $description);
+
+                    unset($_SESSION['isbn'], $_SESSION['title'], $_SESSION['author'], $_SESSION['image'], $_SESSION['description']);
+
+                    exit();
+                }
+            } elseif (isset($_POST['editBookSubmit'])) {
+                $isbn = $_POST['isbn'];
+                $title = $_POST['title'];
+                $author = $_POST['author'];
+                $description = $_POST['description'];
+
+                
+                if (!empty($_FILES["image"]["tmp_name"])) {
+                    $image = file_get_contents($_FILES["image"]["tmp_name"]);
+
+                    
+                    if ($image === false) {
+                        $this->handleErrors("Error al cargar la imagen.");
+                    }
+                } else {
+                    $image = ''; 
+                }
+
+                $bookId = $_POST['bookId'];
+
+                $this->editBook($bookId, $isbn, $title, $author, $image, $description);
+            }
+        }
+    }
+
+
 }

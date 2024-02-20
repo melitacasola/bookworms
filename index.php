@@ -101,5 +101,5 @@ if (!empty($searchKeyword)) {
 
 
     <?php
-    require_once __DIR__ . '/src/view/head/footer.php';
+    require_once __DIR__ . '/src/view/footer/footer.php';
     ?>
